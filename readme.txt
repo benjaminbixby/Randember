@@ -2,14 +2,14 @@ Created by Benjamin Bixby
 benjaminbixby.com
 bixby1@mail.lcc.edu
 
-This plugin uses the PHP function array_rand() on an array containing every single member_id inside your EE database.  Unfortunately, array_rand() is not very "random"... so the functunality is there for now... it's just not as good as it should be (due to PHP's native random function not being that great).  As I get better at PHP, I'll be able to update this and make it so that each template call truly produces a random result.
+This plugin uses the PHP function array_rand() on an array containing every single member_id inside your EE database.  You can also now specify a "member group" by using the parameter "groupid='#'".  Unfortunately, array_rand() is not very "random"... so the functunality is there for now... it's just not as good as it should be (due to PHP's native random function not being that great).  As I get better at PHP, I'll be able to update this and make it so that each template call truly produces a random result.
 
 ** Use this carefully as it queries ALL MEMBER GROUPS, including admins!!**
 
 To use the plugin, follow this syntax:
 --------------------------------------
 
-{exp:random_member parse="inward"} {!-- start plugin --}
+{exp:random_member groupid="5" parse="inward"} {!-- start plugin --}
 
 	{!-- ee member tag --}
 	{exp:member:custom_profile_data member_id="{random_member}"} {!-- the "random_member" tag must be used here for the plugin to work correctly --}
@@ -25,3 +25,16 @@ To use the plugin, follow this syntax:
 
 EE2 Member Documentation:
 http://expressionengine.com/user_guide/modules/member/index.html#custom-profile-data-tag
+
+/*----------------------------------------------------*/
+
+Changelog
+
+V 1.0.1
+- Nov 18, 2011
+Fixed a bug where array_rand() might return a value of "0".
+Added the "groupid" parameter
+
+V 1.0
+- Nov 17, 2011
+Released initial version

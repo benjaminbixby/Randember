@@ -26,7 +26,7 @@
 
 $plugin_info = array(
 	'pi_name'		=> 'Randember',
-	'pi_version'	=> '1.0',
+	'pi_version'	=> '1.0.1',
 	'pi_author'		=> 'Benjamin Bixby',
 	'pi_author_url'	=> 'http://benjaminbixby.com',
 	'pi_description'=> 'Returns a random member.',
@@ -44,26 +44,35 @@ class Random_member {
 	public function __construct()
 	{
 		$this->EE =& get_instance();
-
 		$allmembers = array();
+		$group = $this->EE->TMPL->fetch_param('groupid');
 
-		// Sql the database for all available members
-		$sql = "SELECT * FROM `exp_members`";
-
+		// Check to see if a group was specified
+		if ($group != "")
+		{
+			// Set sql with group_id selection
+			$sql = "SELECT `member_id` FROM `exp_members` WHERE `group_id`=$group";
+		}
+		else
+		{
+			// Set sql for all available members
+			$sql = "SELECT `member_id` FROM `exp_members`";
+		}
+			
 		// Run the query
 		$query = $this->EE->db->query($sql);
 
 		// Check for returned values
 		if ($query->num_rows() > 0)
-    	{
-    		foreach($query->result_array() as $row)
-    		{
-    			array_push($allmembers, $row['member_id']);
-    		}
-	    }
+	    {
+	    	foreach($query->result_array() as $row)
+	    	{
+	    		array_push($allmembers, $row['member_id']);
+	    	}
+		}
 
 		// Select one member_id randomly, aka NEO
-		$the_chosen_one = array_rand($allmembers, 1);
+		$the_chosen_one = $allmembers[array_rand($allmembers, 1)];
 
 		// Return the member_id and replace the tag
 		$tagdata = $this->EE->TMPL->tagdata;
@@ -81,7 +90,9 @@ class Random_member {
 		ob_start();
 ?>
 
-Returns a random member's name.  Make sure you use "parse=inward" to the plugin. Ex: {exp:random_member parse="inward"} ... {random_member} ... {/exp:random_member}. May expand in future to return different values based on parameter's given.
+Returns a random member_id.  Make sure you use "parse=inward" to the plugin. Ex: {exp:random_member parse="inward"} ... {random_member} ... {/exp:random_member}.
+
+You can also use it to select a random member based on a member group id. Ex: {exp:random_member groupid="5" parse="inward"} ... {random_member} ... {/exp:random_member}.
 
 <?php
 		$buffer = ob_get_contents();
