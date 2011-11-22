@@ -26,7 +26,7 @@
 
 $plugin_info = array(
 	'pi_name'		=> 'Randember',
-	'pi_version'	=> '1.0.1',
+	'pi_version'	=> '1.0.2',
 	'pi_author'		=> 'Benjamin Bixby',
 	'pi_author_url'	=> 'http://benjaminbixby.com',
 	'pi_description'=> 'Returns a random member.',
@@ -44,13 +44,44 @@ class Random_member {
 	public function __construct()
 	{
 		$this->EE =& get_instance();
+
+		$sql_where = "";
+
 		$allmembers = array();
+
+		$multiple = array();
+
 		$group = $this->EE->TMPL->fetch_param('groupid');
 
-		// Check to see if a group was specified
-		if ($group != "")
+		$multiple = explode("|", $group);
+
+			$i = 0;
+			$c = count($multiple);
+
+		if ($group != "" && $multiple != "")
 		{
-			// Set sql with group_id selection
+			foreach ($multiple as $k => $v)
+			{
+				if ($i++ < $c - 1)
+				{
+					$sql_where .= $v." AND ";
+				}
+				else
+				{
+					$sql_where .= $v;
+				}
+			}
+		}
+
+		// Check to see if a group was specified
+		if ($group != "" && $c >= 2)
+		{
+			// Set sql with multiple group_id selection
+			$sql = "SELECT `member_id` FROM `exp_members` WHERE `group_id`=$sql_where";
+		}
+		else if ($group != "" && $c <= 1)
+		{
+			// Set sql with one group_id selection
 			$sql = "SELECT `member_id` FROM `exp_members` WHERE `group_id`=$group";
 		}
 		else
@@ -69,14 +100,18 @@ class Random_member {
 	    	{
 	    		array_push($allmembers, $row['member_id']);
 	    	}
+
+	    	// Select one member_id randomly, aka NEO
+			$the_chosen_one = $allmembers[array_rand($allmembers, 1)];
+			
+			// Return the member_id and replace the tag
+			$tagdata = $this->EE->TMPL->tagdata;
+			return $this->return_data = str_replace("{random_member}", $the_chosen_one, $tagdata);
 		}
-
-		// Select one member_id randomly, aka NEO
-		$the_chosen_one = $allmembers[array_rand($allmembers, 1)];
-
-		// Return the member_id and replace the tag
-		$tagdata = $this->EE->TMPL->tagdata;
-		return $this->return_data = str_replace("{random_member}", $the_chosen_one, $tagdata);
+		else
+		{
+			// do nothing
+		}
 
 	}
 	
@@ -90,9 +125,13 @@ class Random_member {
 		ob_start();
 ?>
 
-Returns a random member_id.  Make sure you use "parse=inward" to the plugin. Ex: {exp:random_member parse="inward"} ... {random_member} ... {/exp:random_member}.
+Returns a random member_id.  Make sure you use "parse=inward" to the plugin. Ex:
 
-You can also use it to select a random member based on a member group id. Ex: {exp:random_member groupid="5" parse="inward"} ... {random_member} ... {/exp:random_member}.
+{exp:random_member parse="inward"} ... {random_member} ... {/exp:random_member}
+
+You can also use it to select a random member based on a member group id (single group or multiple groups... use standard EE syntax and separate group numbers by using the pipe character i.e. "3|4". Ex:
+
+{exp:random_member groupid="3|5" parse="inward"} ... {random_member} ... {/exp:random_member}
 
 <?php
 		$buffer = ob_get_contents();
