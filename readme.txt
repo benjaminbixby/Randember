@@ -36,6 +36,10 @@ I make use of the PHP function array_rand() to pull out a random member id... Un
 
 Changelog
 
+V 1.0.3
+- Nov 22, 2011
+Small change to MySQL WHERE clause
+
 V 1.0.2
 - Nov 22, 2011
 Fixed bug where no member would return error

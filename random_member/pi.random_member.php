@@ -26,7 +26,7 @@
 
 $plugin_info = array(
 	'pi_name'		=> 'Randember',
-	'pi_version'	=> '1.0.2',
+	'pi_version'	=> '1.0.3',
 	'pi_author'		=> 'Benjamin Bixby',
 	'pi_author_url'	=> 'http://benjaminbixby.com',
 	'pi_description'=> 'Returns a random member.',
@@ -64,11 +64,11 @@ class Random_member {
 			{
 				if ($i++ < $c - 1)
 				{
-					$sql_where .= $v." AND ";
+					$sql_where .= "(group_id = '".$v."') OR ";
 				}
 				else
 				{
-					$sql_where .= $v;
+					$sql_where .= "(group_id = '".$v."')";
 				}
 			}
 		}
@@ -77,7 +77,7 @@ class Random_member {
 		if ($group != "" && $c >= 2)
 		{
 			// Set sql with multiple group_id selection
-			$sql = "SELECT `member_id` FROM `exp_members` WHERE `group_id`=$sql_where";
+			$sql = "SELECT member_id FROM exp_members WHERE $sql_where";
 		}
 		else if ($group != "" && $c <= 1)
 		{
